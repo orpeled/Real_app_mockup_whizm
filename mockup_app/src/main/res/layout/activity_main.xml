@@ -29,7 +29,7 @@
     <Button
         style="?android:attr/buttonStyleSmall"
         android:layout_width="80dp"
-        android:layout_height="-50dp"
+        android:layout_height="-40dp"
         android:text="N"
         android:textColor="#00000000"
         android:id="@+id/config_button"

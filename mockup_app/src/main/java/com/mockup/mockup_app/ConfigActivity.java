@@ -1,6 +1,8 @@
 package com.mockup.mockup_app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -13,12 +15,18 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ConfigActivity extends ActionBarActivity {
 
     Button homeButton;
     Button statsButton;
+
+    private SeekBar seekBar;
+    private TextView textView;
+    int progress = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +72,48 @@ public class ConfigActivity extends ActionBarActivity {
             }
         };
         statsButton.setOnClickListener(statsHandler);
-    }
 
+        // Seek bar
+        seekBar = (SeekBar) findViewById(R.id.seekBar1);
+        textView = (TextView) findViewById(R.id.textView1);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String AmountShared = preferences.getString("AmountShared","");
+        if(AmountShared.equalsIgnoreCase("")) {
+            AmountShared = progress + "";  /* Edit the value here*/
+        }
+        // Initialize the textview with '0'
+        seekBar.setProgress(Integer.parseInt(AmountShared));
+        textView.setText(AmountShared + "MB");
+        seekBar.setOnSeekBarChangeListener(
+                new SeekBar.OnSeekBarChangeListener() {
+
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar,
+                                                  int progressValue, boolean fromUser) {
+                        progress = progressValue;
+                        seekBar.setProgress(progress);
+                        textView.setText(progress + "MB");
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+                        // Do something here,
+                        //if you want to do anything at the start of
+                        // touching the seekbar
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+                        // Display the value in textview
+                        //textView.setText(progress + "MB");
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ConfigActivity.this);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("AmountShared", progress + "");
+                        editor.commit();
+                    }
+                });
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
