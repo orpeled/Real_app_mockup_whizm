@@ -30,10 +30,13 @@
             android:name="com.mockup.mockup_app.ConfigActivity"
             android:label="@string/title_activity_config" >
         </activity>
+
+        <!--stats activity-->
         <activity
             android:name="com.mockup.mockup_app.StatsActivity"
             android:label="@string/title_activity_stats" >
         </activity>
+
     </application>
 
 </manifest>

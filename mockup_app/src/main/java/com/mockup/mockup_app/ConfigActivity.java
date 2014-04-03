@@ -28,6 +28,11 @@ public class ConfigActivity extends ActionBarActivity {
     private TextView textView;
     int progress = 0;
 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_config, null);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,13 +83,13 @@ public class ConfigActivity extends ActionBarActivity {
         textView = (TextView) findViewById(R.id.textView1);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String AmountShared = preferences.getString("AmountShared","");
-        if(AmountShared.equalsIgnoreCase("")) {
-            AmountShared = progress + "";  /* Edit the value here*/
+        String amountShared = preferences.getString("amountShared","");
+        if(amountShared.equalsIgnoreCase("")) {
+            amountShared = progress + "";  /* Edit the value here*/
         }
         // Initialize the textview with '0'
-        seekBar.setProgress(Integer.parseInt(AmountShared));
-        textView.setText(AmountShared + "MB");
+        seekBar.setProgress(Integer.parseInt(amountShared));
+        textView.setText(amountShared + "MB");
         seekBar.setOnSeekBarChangeListener(
                 new SeekBar.OnSeekBarChangeListener() {
 
@@ -109,7 +114,7 @@ public class ConfigActivity extends ActionBarActivity {
                         //textView.setText(progress + "MB");
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ConfigActivity.this);
                         SharedPreferences.Editor editor = preferences.edit();
-                        editor.putString("AmountShared", progress + "");
+                        editor.putString("amountShared", progress + "");
                         editor.commit();
                     }
                 });

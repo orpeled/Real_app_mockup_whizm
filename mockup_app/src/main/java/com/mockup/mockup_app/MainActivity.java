@@ -1,11 +1,17 @@
 package com.mockup.mockup_app;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,12 +20,18 @@ import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
 
 public class MainActivity extends ActionBarActivity {
 
     Button configButton;
     Button statsButton;
+    private ScreenSlidePagerAdapter mPagerAdapter;
+    ViewPager mPager;
+    private static final int NUM_PAGES = 3;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +43,12 @@ public class MainActivity extends ActionBarActivity {
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
         }
+
+        // Instantiate a ViewPager and a PagerAdapter.
+        //TODO set vars according conventions
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
 
         // Hide action bar in order to stretch the image on full screen.
         ActionBar actionBar = getSupportActionBar();
@@ -61,6 +79,79 @@ public class MainActivity extends ActionBarActivity {
             }
         };
         statsButton.setOnClickListener(statsHandler);
+
+    }
+
+    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+        public ScreenSlidePagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            return new ScreenSlidePageFragment(position);
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            return super.instantiateItem(container, position);
+        }
+    }
+
+    public class ScreenSlidePageFragment extends Fragment {
+
+        int layoutId;
+
+        //ctor
+        public ScreenSlidePageFragment(int index) {
+            switch (index) {
+                case 0:
+                    layoutId = R.layout.activity_main;
+                    break;
+                case 1:
+                    layoutId = R.layout.activity_stats;
+                    break;
+                case 2:
+                    layoutId = R.layout.activity_config;
+                    break;
+            }
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final String ARG_OBJECT = "object";
+
+            ViewGroup rootView = (ViewGroup) inflater.inflate(
+                    layoutId, container, false);
+            try {
+
+                Bundle args = getArguments();
+                assert rootView != null;
+                configButton = (Button) findViewById(R.id.config_button);
+
+                ViewGroup.OnClickListener handler = new ViewGroup.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent configIntent = new Intent(MainActivity.this, ConfigActivity.class);
+                        startActivity(configIntent);
+                    }
+                };
+
+                configButton.setOnClickListener(handler);
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.err.print("Reuven: " + e);
+            }
+
+            return rootView;
+        }
     }
 
 
