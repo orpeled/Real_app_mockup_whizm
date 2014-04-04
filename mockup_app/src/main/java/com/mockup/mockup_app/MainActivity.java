@@ -1,35 +1,36 @@
 package com.mockup.mockup_app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.Html;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends FragmentActivity {
 
     Button configButton;
     Button statsButton;
-    private ScreenSlidePagerAdapter mPagerAdapter;
-    ViewPager mPager;
+
+    private SeekBar seekBar;
+    private TextView textView;
+    int progress = 0;
+
+    private ScreenSlidePagerAdapter pagerAdapter;
+    ViewPager pager;
     private static final int NUM_PAGES = 3;
 
 
@@ -45,14 +46,13 @@ public class MainActivity extends ActionBarActivity {
         }
 
         // Instantiate a ViewPager and a PagerAdapter.
-        //TODO set vars according conventions
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
+        pager = (ViewPager) findViewById(R.id.pager);
+        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        pager.setAdapter(pagerAdapter);
 
-        // Hide action bar in order to stretch the image on full screen.
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+//        // Hide action bar in order to stretch the image on full screen.
+//        ActionBar actionBar = getSupportActionBar();
+//        actionBar.hide();
 
         // Screen image for main screen.
         ImageView imageView1 = (ImageView) findViewById(R.id.imageView1);
@@ -89,18 +89,12 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public Fragment getItem(int position) {
-
             return new ScreenSlidePageFragment(position);
         }
 
         @Override
         public int getCount() {
             return NUM_PAGES;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            return super.instantiateItem(container, position);
         }
     }
 
@@ -124,40 +118,151 @@ public class MainActivity extends ActionBarActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+        public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                                  Bundle savedInstanceState) {
-            final String ARG_OBJECT = "object";
-
             ViewGroup rootView = (ViewGroup) inflater.inflate(
                     layoutId, container, false);
-            try {
+            // Main
+            if (layoutId == R.layout.activity_main) {
+                Button btnConfig;
+                Button btnStats;
 
-                Bundle args = getArguments();
-                assert rootView != null;
-                configButton = (Button) findViewById(R.id.config_button);
+                btnConfig = (Button)rootView.findViewById(R.id.config_button);
+                btnStats = (Button)rootView.findViewById(R.id.stats_button);
 
-                ViewGroup.OnClickListener handler = new ViewGroup.OnClickListener() {
+                // Config from home
+                View.OnClickListener configHandler = new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent configIntent = new Intent(MainActivity.this, ConfigActivity.class);
-                        startActivity(configIntent);
+                        ((MainActivity)getActivity()).switchToFragmentConfig();
                     }
                 };
+                btnConfig.setOnClickListener(configHandler);
 
-                configButton.setOnClickListener(handler);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.err.print("Reuven: " + e);
+                // stats from home
+                View.OnClickListener statsHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentStats();
+                    }
+                };
+                btnStats.setOnClickListener(statsHandler);
+
             }
+            if (layoutId == R.layout.activity_stats) {
+                Button btnConfig;
+                Button btnHome;
 
+                btnConfig = (Button)rootView.findViewById(R.id.config_button);
+                btnHome = (Button)rootView.findViewById(R.id.home_button);
+
+                // Config from stats
+                View.OnClickListener configHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentConfig();
+                    }
+                };
+                btnConfig.setOnClickListener(configHandler);
+
+                // Home from stats
+                View.OnClickListener homeHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentMain();
+                    }
+                };
+                btnHome.setOnClickListener(homeHandler);
+            }
+            if (layoutId == R.layout.activity_config) {
+                Button btnStats;
+                Button btnHome;
+
+                // Stats from config
+                btnStats = (Button)rootView.findViewById(R.id.stats_button);
+                View.OnClickListener statsHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentStats();
+                    }
+                };
+                btnStats.setOnClickListener(statsHandler);
+
+                // Home form Config
+                btnHome = (Button)rootView.findViewById(R.id.home_button);
+                View.OnClickListener homeHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentMain();
+                    }
+                };
+                btnHome.setOnClickListener(homeHandler);
+
+
+                seekBar = (SeekBar) findViewById(R.id.seekBar1);
+                textView = (TextView) findViewById(R.id.textView1);
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                String amountShared = preferences.getString("amountShared","");
+                if(amountShared.equalsIgnoreCase("")) {
+                    amountShared = progress + "";  /* Edit the value here*/
+                }
+                // Initialize the textview with '0'
+                seekBar.setProgress(Integer.parseInt(amountShared));
+                textView.setText(amountShared + "MB");
+                seekBar.setOnSeekBarChangeListener(
+                        new SeekBar.OnSeekBarChangeListener() {
+
+                            @Override
+                            public void onProgressChanged(SeekBar seekBar,
+                                                          int progressValue, boolean fromUser) {
+                                progress = progressValue;
+                                seekBar.setProgress(progress);
+                                textView.setText(progress + "MB");
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar seekBar) {
+                                // Do something here,
+                                //if you want to do anything at the start of
+                                // touching the seekbar
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar seekBar) {
+                                // Display the value in textview
+                                //textView.setText(progress + "MB");
+                                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.putString("amountShared", progress + "");
+                                editor.commit();
+                            }
+                        });
+
+
+            }
             return rootView;
         }
     }
 
 
+
+    public void switchToFragmentMain(){
+        pager.setCurrentItem(0);
+    }
+
+    public void switchToFragmentStats(){
+        pager.setCurrentItem(1);
+    }
+
+    public void switchToFragmentConfig(){
+        pager.setCurrentItem(2);
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
+
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -185,7 +290,7 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
