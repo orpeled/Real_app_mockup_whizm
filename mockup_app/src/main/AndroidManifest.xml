@@ -25,7 +25,7 @@
             android:label="@string/app_name" >
         </activity>
 
-        <!-- Settings - ConfigView -->
+        <!-- settings - ConfigView -->
         <activity
             android:name="com.mockup.mockup_app.ConfigActivity"
             android:label="@string/title_activity_config" >

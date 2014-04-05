@@ -48,10 +48,16 @@
 
     <SeekBar
         android:id="@+id/seekBar1"
-        android:layout_width="300dp"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="245dp"
+        android:layout_marginLeft="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="130dp"
+        android:layout_marginTop="140dp"
+        android:maxHeight="9dp"
+        android:minHeight="9dp"
         android:max="250"
+        android:progressDrawable="@drawable/progress"
+        android:thumb="@drawable/thumb"
         android:layout_gravity="center_horizontal|top" />
 
     <TextView
