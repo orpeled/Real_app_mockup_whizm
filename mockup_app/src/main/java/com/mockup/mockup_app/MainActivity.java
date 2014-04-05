@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +22,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends ActionBarActivity {
 
     Button configButton;
     Button statsButton;
@@ -31,7 +33,7 @@ public class MainActivity extends FragmentActivity {
 
     private ScreenSlidePagerAdapter pagerAdapter;
     ViewPager pager;
-    private static final int NUM_PAGES = 3;
+    private static final int NUM_PAGES = 4;
 
 
     @Override
@@ -50,9 +52,9 @@ public class MainActivity extends FragmentActivity {
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
 
-//        // Hide action bar in order to stretch the image on full screen.
-//        ActionBar actionBar = getSupportActionBar();
-//        actionBar.hide();
+        // Hide action bar in order to stretch the image on full screen.
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         // Screen image for main screen.
         ImageView imageView1 = (ImageView) findViewById(R.id.imageView1);
@@ -114,6 +116,8 @@ public class MainActivity extends FragmentActivity {
                 case 2:
                     layoutId = R.layout.activity_config;
                     break;
+                case 3:
+                    layoutId = R.layout.activity_add;
             }
         }
 
@@ -126,9 +130,11 @@ public class MainActivity extends FragmentActivity {
             if (layoutId == R.layout.activity_main) {
                 Button btnConfig;
                 Button btnStats;
+                Button btnAdd;
 
                 btnConfig = (Button)rootView.findViewById(R.id.config_button);
                 btnStats = (Button)rootView.findViewById(R.id.stats_button);
+                btnAdd = (Button)rootView.findViewById(R.id.add_button);
 
                 // Config from home
                 View.OnClickListener configHandler = new View.OnClickListener() {
@@ -148,13 +154,26 @@ public class MainActivity extends FragmentActivity {
                 };
                 btnStats.setOnClickListener(statsHandler);
 
+                // add from home
+                View.OnClickListener addHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentAdd();
+                    }
+                };
+                btnAdd.setOnClickListener(addHandler);
+
             }
             if (layoutId == R.layout.activity_stats) {
                 Button btnConfig;
                 Button btnHome;
+                Button btnAdd;
+
 
                 btnConfig = (Button)rootView.findViewById(R.id.config_button);
                 btnHome = (Button)rootView.findViewById(R.id.home_button);
+                btnAdd = (Button)rootView.findViewById(R.id.add_button);
+
 
                 // Config from stats
                 View.OnClickListener configHandler = new View.OnClickListener() {
@@ -173,10 +192,21 @@ public class MainActivity extends FragmentActivity {
                     }
                 };
                 btnHome.setOnClickListener(homeHandler);
+
+                // add from stats
+                View.OnClickListener addHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentAdd();
+                    }
+                };
+                btnAdd.setOnClickListener(addHandler);
             }
             if (layoutId == R.layout.activity_config) {
                 Button btnStats;
                 Button btnHome;
+                Button btnAdd;
+
 
                 // Stats from config
                 btnStats = (Button)rootView.findViewById(R.id.stats_button);
@@ -198,9 +228,19 @@ public class MainActivity extends FragmentActivity {
                 };
                 btnHome.setOnClickListener(homeHandler);
 
+                // add from stats
+                btnAdd = (Button)rootView.findViewById(R.id.add_button);
+                View.OnClickListener addHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentAdd();
+                    }
+                };
+                btnAdd.setOnClickListener(addHandler);
 
-                seekBar = (SeekBar) findViewById(R.id.seekBar1);
-                textView = (TextView) findViewById(R.id.textView1);
+
+                seekBar = (SeekBar) rootView.findViewById(R.id.seekBar1);
+                textView = (TextView) rootView.findViewById(R.id.textView1);
 
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                 String amountShared = preferences.getString("amountShared","");
@@ -241,11 +281,48 @@ public class MainActivity extends FragmentActivity {
 
 
             }
+            // Main
+            if (layoutId == R.layout.activity_add) {
+                Button btnConfig;
+                Button btnStats;
+                Button btnHome;
+
+                btnConfig = (Button)rootView.findViewById(R.id.config_button);
+                btnStats = (Button)rootView.findViewById(R.id.stats_button);
+                btnHome = (Button)rootView.findViewById(R.id.home_button);
+
+
+                // Config from add
+                View.OnClickListener configHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentConfig();
+                    }
+                };
+                btnConfig.setOnClickListener(configHandler);
+
+                // Home form add
+                View.OnClickListener homeHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentMain();
+                    }
+                };
+                btnHome.setOnClickListener(homeHandler);
+
+                // stats from add
+                View.OnClickListener statsHandler = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((MainActivity)getActivity()).switchToFragmentStats();
+                    }
+                };
+                btnStats.setOnClickListener(statsHandler);
+
+            }
             return rootView;
         }
     }
-
-
 
     public void switchToFragmentMain(){
         pager.setCurrentItem(0);
@@ -257,6 +334,10 @@ public class MainActivity extends FragmentActivity {
 
     public void switchToFragmentConfig(){
         pager.setCurrentItem(2);
+    }
+
+    public void switchToFragmentAdd(){
+        pager.setCurrentItem(3);
     }
 
 

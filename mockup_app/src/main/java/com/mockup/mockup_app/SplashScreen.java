@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +16,7 @@ import com.mockup.mockup_app.R;
 
 
 
-public class SplashScreen extends Activity {
+public class SplashScreen extends ActionBarActivity {
 
     private static int SPLASH_TIME_OUT = 3000;
 
@@ -22,6 +24,10 @@ public class SplashScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+
+        // Hide action bar in order to stretch the image on full screen.
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
 
         new Handler().postDelayed(new Runnable() {
 
